@@ -25,8 +25,8 @@ public class BankClientTest {
 
     @Test
     public void balanceTest() {
-        BalanceCheckRequest balanceCheckRequest = BalanceCheckRequest.newBuilder().setAccountNumber(5).build();
+        BalanceCheckRequest balanceCheckRequest = BalanceCheckRequest.newBuilder().setAccountNumber(50).build();
         Balance balance = blockingStub.getBalance(balanceCheckRequest);
-        Assertions.assertEquals(balance.getAmount(), 50);
+        Assertions.assertEquals(balance.getAmount(), 500);
     }
 }
