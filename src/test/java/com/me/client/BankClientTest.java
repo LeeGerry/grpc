@@ -1,16 +1,14 @@
 package com.me.client;
 
-import com.google.common.util.concurrent.Uninterruptibles;
 import com.me.models.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BankClientTest {
@@ -46,24 +44,10 @@ public class BankClientTest {
     }
 
     @Test
-    public void withdrawAsyncTest() {
+    public void withdrawAsyncTest() throws InterruptedException {
         WithdrawRequest request = WithdrawRequest.newBuilder().setAccountNumber(8).setAmount(40).build();
-        bankServiceStub.withdraw(request, new StreamObserver<Money>() {
-            @Override
-            public void onNext(Money money) {
-                System.out.println("received: " + money.getValue());
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                System.out.println("error: " + throwable.getMessage());
-            }
-
-            @Override
-            public void onCompleted() {
-                System.out.println("server is done!");
-            }
-        });
-        Uninterruptibles.sleepUninterruptibly(3, TimeUnit.SECONDS);
+        CountDownLatch latch = new CountDownLatch(1);
+        bankServiceStub.withdraw(request, new MoneyStreamingResponse(latch));
+        latch.await();
     }
 }
