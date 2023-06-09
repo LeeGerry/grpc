@@ -3,6 +3,7 @@ package com.me.client;
 import com.me.models.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,18 @@ public class BankClientTest {
         WithdrawRequest request = WithdrawRequest.newBuilder().setAccountNumber(8).setAmount(40).build();
         CountDownLatch latch = new CountDownLatch(1);
         bankServiceStub.withdraw(request, new MoneyStreamingResponse(latch));
+        latch.await();
+    }
+
+    @Test
+    public void cashStreamingRequest() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        StreamObserver<DepositRequest> depositRequestStreamObserver = bankServiceStub.cashDeposit(new BalanceStreamObserver(latch));
+        for (int i = 0; i < 10; i++) {
+            DepositRequest request = DepositRequest.newBuilder().setAccountNumber(8).setAmount(10).build();
+            depositRequestStreamObserver.onNext(request);
+        }
+        depositRequestStreamObserver.onCompleted();
         latch.await();
     }
 }
