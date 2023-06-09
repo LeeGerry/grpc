@@ -7,11 +7,11 @@ import java.util.stream.IntStream;
 
 public class AccountDatabase {
     private static final Map<Integer, Integer> map = IntStream
-            .range(1, 100)
+            .range(1, 15)
             .boxed()
             .collect(Collectors.toMap(
                     Function.identity(),
-                    v -> v * 10)
+                    v -> 100)
             );
 
     public static Integer getBalance(int accountId) {
@@ -24,5 +24,9 @@ public class AccountDatabase {
 
     public static Integer deductBalance(int accountId, int amount) {
         return map.computeIfPresent(accountId, (k, v) -> v - amount);
+    }
+
+    public static void printAccountDetails() {
+        System.out.println(map);
     }
 }
