@@ -1,8 +1,6 @@
 package com.me.client;
 
-import com.me.models.Balance;
-import com.me.models.BalanceCheckRequest;
-import com.me.models.BankServiceGrpc;
+import com.me.models.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.junit.jupiter.api.Assertions;
@@ -28,5 +26,16 @@ public class BankClientTest {
         BalanceCheckRequest balanceCheckRequest = BalanceCheckRequest.newBuilder().setAccountNumber(50).build();
         Balance balance = blockingStub.getBalance(balanceCheckRequest);
         Assertions.assertEquals(balance.getAmount(), 500);
+    }
+
+    @Test
+    public void withdrawTest() {
+        WithdrawRequest request = WithdrawRequest.newBuilder().setAccountNumber(6).setAmount(40).build();
+        blockingStub.withdraw(request)
+                .forEachRemaining((Money money) -> {
+                    int value = money.getValue();
+                    System.out.println("result: " + value);
+                    Assertions.assertEquals(10, value);
+                });
     }
 }
