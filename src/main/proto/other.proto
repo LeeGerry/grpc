@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option  java_package = "com.me.models";
+
+message DeadlineRequest {
+  string request_string = 1;
+}
+message DeadlineResponse {
+  string response_string = 1;
+}
+service OtherService {
+  rpc deadlineTest(DeadlineRequest) returns (DeadlineResponse);
+}
