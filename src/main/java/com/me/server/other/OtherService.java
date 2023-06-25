@@ -2,6 +2,7 @@ package com.me.server.other;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.me.models.*;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -22,17 +23,19 @@ public class OtherService extends OtherServiceGrpc.OtherServiceImplBase {
     public void deadlineServerStreamTest(DeadlineServerStreamRequest request, StreamObserver<DeadlineServerStreamResponse> responseObserver) {
         int size = request.getSize();
         System.out.println("收到Client请求 " + size + " 条message");
-        for (int i = 0; i < size; i++) {
+        int i = 0;
+        for (; i < size; i++) {
             DeadlineServerStreamResponse response = DeadlineServerStreamResponse
                     .newBuilder()
                     .setMessage("message from server " + i)
                     .build();
+            if (Context.current().isCancelled()) break;
             responseObserver.onNext(response);
             System.out.println("第" + i + "条message已发送");
             // Sleep 2 seconds after sending each message
             Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
         }
         responseObserver.onCompleted();
-        System.out.println("发送完成，共发送 " + size + "条message");
+        System.out.println("发送完成，共发送 " + i + "条message");
     }
 }
