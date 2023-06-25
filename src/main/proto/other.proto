@@ -9,6 +9,13 @@ message DeadlineRequest {
 message DeadlineResponse {
   string response_string = 1;
 }
+message DeadlineServerStreamRequest {
+  int32 size = 1;
+}
+message DeadlineServerStreamResponse {
+  string message = 1;
+}
 service OtherService {
   rpc deadlineTest(DeadlineRequest) returns (DeadlineResponse);
+  rpc deadlineServerStreamTest(DeadlineServerStreamRequest) returns (stream DeadlineServerStreamResponse);
 }

@@ -1,9 +1,7 @@
 package com.me.server.other;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.me.models.DeadlineRequest;
-import com.me.models.DeadlineResponse;
-import com.me.models.OtherServiceGrpc;
+import com.me.models.*;
 import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.TimeUnit;
@@ -18,5 +16,23 @@ public class OtherService extends OtherServiceGrpc.OtherServiceImplBase {
         Uninterruptibles.sleepUninterruptibly(3, TimeUnit.SECONDS);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deadlineServerStreamTest(DeadlineServerStreamRequest request, StreamObserver<DeadlineServerStreamResponse> responseObserver) {
+        int size = request.getSize();
+        System.out.println("收到Client请求 " + size + " 条message");
+        for (int i = 0; i < size; i++) {
+            DeadlineServerStreamResponse response = DeadlineServerStreamResponse
+                    .newBuilder()
+                    .setMessage("message from server " + i)
+                    .build();
+            responseObserver.onNext(response);
+            System.out.println("第" + i + "条message已发送");
+            // Sleep 2 seconds after sending each message
+            Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
+        }
+        responseObserver.onCompleted();
+        System.out.println("发送完成，共发送 " + size + "条message");
     }
 }
