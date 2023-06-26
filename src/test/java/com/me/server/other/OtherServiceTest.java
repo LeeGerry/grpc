@@ -26,6 +26,7 @@ class OtherServiceTest {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress("localhost", 6666)
                 .usePlaintext()
+                .intercept(new DeadlineInterceptor())
                 .build();
         blockingStub = OtherServiceGrpc.newBlockingStub(channel);
         stub = OtherServiceGrpc.newStub(channel);
@@ -91,9 +92,7 @@ class OtherServiceTest {
                 .setSize(5)
                 .build();
         CountDownLatch latch = new CountDownLatch(1);
-        stub
-                .withDeadline(Deadline.after(4, TimeUnit.SECONDS))
-                .deadlineServerStreamTest(request, new StreamObserver<DeadlineServerStreamResponse>() {
+        stub.deadlineServerStreamTest(request, new StreamObserver<DeadlineServerStreamResponse>() {
                     @Override
                     public void onNext(DeadlineServerStreamResponse deadlineServerStreamResponse) {
                         System.out.println("Client 收到: " + deadlineServerStreamResponse.getMessage());
