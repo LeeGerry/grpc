@@ -47,6 +47,28 @@ public class MetadataClientTest {
         MetaResponse metaResponse = blockingStub
                 .withCallCredentials(new ClientSessionToken("client-secret-3"))
                 .metadataTest(req);
-        Assertions.assertEquals(metaResponse.getResult(), "result");
+        Assertions.assertEquals(metaResponse.getResult(), "result_STANDARD");
+    }
+
+    @Test
+    public void testValidAuthWithUserRoleSTANDARD() {
+        MetaRequest req = MetaRequest
+                .newBuilder()
+                .build();
+        MetaResponse metaResponse = blockingStub
+                .withCallCredentials(new ClientSessionToken("client-secret-3-standard"))
+                .metadataTest(req);
+        Assertions.assertEquals(metaResponse.getResult(), "result_STANDARD");
+    }
+
+    @Test
+    public void testValidAuthWithUserRolePRIME() {
+        MetaRequest req = MetaRequest
+                .newBuilder()
+                .build();
+        MetaResponse metaResponse = blockingStub
+                .withCallCredentials(new ClientSessionToken("client-secret-3-prime"))
+                .metadataTest(req);
+        Assertions.assertEquals(metaResponse.getResult(), "result_PRIME");
     }
 }

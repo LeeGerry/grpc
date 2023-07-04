@@ -15,7 +15,14 @@ public class AuthInterceptor implements ServerInterceptor {
         System.out.println("Server get token from client: " + clientToken);
 
         if (valid(clientToken)) {
-            return serverCallHandler.startCall(serverCall, metadata);
+            assert clientToken != null;
+            UserRole userRole = getUserRole(clientToken);
+            Context context = Context.current().withValue(
+                    ServerConstants.CTX_USER_ROLE,
+                    userRole
+            );
+            return Contexts.interceptCall(context, serverCall, metadata, serverCallHandler);
+//            return serverCallHandler.startCall(serverCall, metadata);
         } else {
             Status status = Status.UNAUTHENTICATED.withDescription("invalid token / expired token");
             serverCall.close(status, metadata);
@@ -25,6 +32,11 @@ public class AuthInterceptor implements ServerInterceptor {
     }
 
     private boolean valid(String token) {
-        return Objects.nonNull(token) && token.equals("client-secret-3");
+        return Objects.nonNull(token)
+                && (token.startsWith("client-secret-3") || token.startsWith("client-secret-2"));
+    }
+
+    private UserRole getUserRole(String jwt) {
+        return jwt.endsWith("prime") ? UserRole.PRIME : UserRole.STANDARD;
     }
 }
