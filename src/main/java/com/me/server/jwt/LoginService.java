@@ -3,6 +3,7 @@ package com.me.server.jwt;
 import come.me.model.LoginBody;
 import come.me.model.LoginResponse;
 import come.me.model.LoginServiceGrpc;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import io.jsonwebtoken.Jwts;
 
@@ -18,8 +19,7 @@ public class LoginService extends LoginServiceGrpc.LoginServiceImplBase {
             responseObserver.onCompleted();
         } else {
             System.out.println("login error");
-            responseObserver.onNext(LoginResponse.newBuilder().setToken("error").build());
-            responseObserver.onCompleted();
+            responseObserver.onError(Status.UNAUTHENTICATED.withDescription("login error").asException());
         }
     }
 

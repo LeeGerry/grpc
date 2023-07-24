@@ -40,10 +40,10 @@ public class AuthClientTest {
     public void testLoginFailed() {
         LoginServiceGrpc.LoginServiceBlockingStub loginStub = LoginServiceGrpc.newBlockingStub(channel);
         LoginBody request = LoginBody.newBuilder().setUsername("Jack1").setPassword("test").build();
-        LoginResponse response = loginStub.login(request);
-        String token = response.getToken();
-        System.out.println(token);
-        Assertions.assertEquals(token, "error");
+        StatusRuntimeException thrown = Assertions.assertThrows(StatusRuntimeException.class, () -> {
+            LoginResponse response = loginStub.login(request);
+        });
+        Assertions.assertEquals(thrown.getStatus().getDescription(), "login error");
     }
 
     @Test
